@@ -9,37 +9,33 @@ const INITIAL_SESSION = {
   messages: []
 };
 
-const bot = new Telegraf(config.get('TELEGRAM_TOKEN'));
+const TELEGRAM_TOKEN = config.get('TELEGRAM_TOKEN') || process.env.TELEGRAM_TOKEN;
+
+const bot = new Telegraf(TELEGRAM_TOKEN);
 
 bot.use(session());
 
 bot.command('new', async (ctx) => {
   ctx.session = INITIAL_SESSION;
-  await ctx.reply('Жду Ваше сообщение');
+  await ctx.reply('Давайте общаться...');
 });
 
 bot.command('start', async (ctx) => {
   ctx.session = INITIAL_SESSION;
-  await ctx.reply('Жду Ваше сообщение');
+  await ctx.reply('Давайте общаться...');
 });
-
-// bot.on(message('text'), async (ctx) => {
-//   await ctx.reply(JSON.stringify(ctx.message, null, 2))
-// });
 
 bot.on(message('voice'), async (ctx) => {
   ctx.session ??= INITIAL_SESSION;
-
   try {
     const userId = ctx.message.from.id;
     const fileId = ctx.message.voice.file_id;
 
-    ctx.reply(code('Сообщение принял...'));
+    ctx.reply(code('ммм...'));
 
     const fileLink = await ctx.telegram.getFileLink(fileId);
     const oggPath = await ogg.create(fileLink, userId);
     const mp3Path = await ogg.toMp3(oggPath, userId);
-
     const text = await openai.transcription(mp3Path);
 
     ctx.session.messages.push({role: openai.roles.USER, content: text});
@@ -47,9 +43,9 @@ bot.on(message('voice'), async (ctx) => {
     ctx.session.messages.push({role: openai.roles.ASSISTANT, content: response.content});
 
     await ctx.reply(response.content);
-    // ctx.reply(JSON.stringify(fileLink, null, 2))
-  } catch (e) {
 
+  } catch (e) {
+    console.log('Error', e.message);
   }
 
 });
@@ -58,8 +54,7 @@ bot.on(message('text'), async (ctx) => {
   ctx.session ??= INITIAL_SESSION;
 
   try {
-    ctx.reply(code('Сообщение принял...'));
-
+    ctx.reply(code('ммм...'));
     const text = ctx.message.text;
 
     ctx.session.messages.push({role: openai.roles.USER, content: text});
@@ -67,11 +62,10 @@ bot.on(message('text'), async (ctx) => {
     ctx.session.messages.push({role: openai.roles.ASSISTANT, content: response.content});
 
     await ctx.reply(response.content);
-    // ctx.reply(JSON.stringify(fileLink, null, 2))
+
   } catch (e) {
-
+    console.log('Error', e.message);
   }
-
 });
 
 bot.command('start', async (ctx) => {

@@ -2,6 +2,8 @@ import { Configuration, OpenAIApi } from 'openai';
 import config from 'config';
 import { createReadStream } from 'fs';
 
+const OPEN_AI_KEY = config.get('OPEN_AI_KEY') || process.env.OPEN_AI_KEY;
+
 class OpenAI {
   roles = {
     ASSISTANT: 'assistant',
@@ -37,9 +39,9 @@ class OpenAI {
       );
       return response.data.text;
     } catch (e) {
-      console.log('Error trans', e.message);
+      console.log('Error transcription', e.message);
     }
   }
 }
 
-export const openai = new OpenAI(config.get('OPEN_AI_KEY'));
+export const openai = new OpenAI(OPEN_AI_KEY);

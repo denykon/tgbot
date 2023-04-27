@@ -21,7 +21,7 @@ class OggConverter {
           .inputOptions('-t 30')
           .output(outputPath)
           .on('end', () => {
-            removeFile(input);
+            removeFile(input).catch(e => console.log('Can not remove file', e.message));
             resolve(outputPath);
           })
           .on('error', (err) => reject(err.message))
@@ -29,7 +29,7 @@ class OggConverter {
       });
 
     } catch (e) {
-      console.log('Error', e.message);
+      console.log('Error file conversion to mp3', e.message);
     }
   }
 
@@ -50,9 +50,7 @@ class OggConverter {
     } catch (e) {
       console.log('Error in creating ogg', e.message);
     }
-
   }
-
 }
 
 export const ogg = new OggConverter();
